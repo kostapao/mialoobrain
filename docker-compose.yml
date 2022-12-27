@@ -1,0 +1,12 @@
+services:
+
+  backend:
+    build: ./
+    restart: always
+    ports:
+        - 80:80
+    
+  tika:
+    image: apache/tika
+    ports:
+        - 9998:9998
