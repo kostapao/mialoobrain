@@ -3,10 +3,22 @@ services:
   backend:
     build: ./
     restart: always
-    ports:
-        - 80:80
+    expose:
+      - 5000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fastapi.rule=Host(`fastapi.localhost`)"
     
   tika:
     image: apache/tika
     ports:
         - 9998:9998
+  
+  traefik:
+    image: traefik:v2.2
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "$PWD/services/traefik/traefik.dev.toml:/etc/traefik/traefik.toml"
