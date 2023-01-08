@@ -1,0 +1,27 @@
+services:
+
+  backend:
+    build: ./
+    restart: always
+    expose:
+      - 5000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fastapi.rule=Host(`api.mialoo.me`)"
+      - "traefik.http.routers.fastapi.tls=true"
+      - "traefik.http.routers.fastapi.tls.certresolver=letsencrypt"
+    
+  tika:
+    image: apache/tika
+    ports:
+        - 9998:9998
+
+
+  traefik:
+    image: traefik:v2.2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./traefik/traefik.prod.toml:/etc/traefik/traefik.toml"
