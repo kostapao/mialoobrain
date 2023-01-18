@@ -7,9 +7,10 @@ from brain.keyword_extraction.keywordextraction import keyword_extraction
 from brain.wikipedia_extraction.wikipediaextraction import wikipedia_extraction
 from brain.wikipedia_extraction.helper.wikipedia_prep import create_ranked_clusters, create_search_batches
 from brain.mindmap_creation.connect import connect
+from brain.mindmap_creation.nodes_edges import get_nodes_edges
 
 
-filtest_file = "/Users/kosta/Documents/10_mialoo/app/script/data/4_Classification.pdf"
+filtest_file = "/Users/kosta/Documents/15_Test_Lectures/3_Clustering.pdf"
 
 
 async def main(file):
@@ -30,19 +31,17 @@ def main_local(file):
     b = text_processing(a)
     c = keyword_extraction(b)
     d = create_ranked_clusters(c)
-    e = create_search_batches(d)
-    # d = wikipedia_extraction(c)
-    # e = connect(d)
-    return e
+    e = create_search_batches(d)    
+    f = wikipedia_extraction(e)
+    g = connect(f)
+    h = get_nodes_edges(g)
+    return h
 
 
 
 
 
 if __name__ == "__main__":
-    clusters = main_local(filtest_file)
-    for cluster in clusters:
-        print(cluster)
-        print(20* "*")
+    print(main_local(filtest_file))
     #connect(lec)
     #this is the test

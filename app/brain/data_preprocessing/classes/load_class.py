@@ -17,8 +17,9 @@ from typing import List
 from .main_class import Lecture, Slide
 
 #TODO: Uncomment for remote
-os.environ['TIKA_CLIENT_ONLY'] = "1"
-os.environ['TIKA_SERVER_ENDPOINT'] = "http://tika:9998"
+#TODO: Comment for local
+# os.environ['TIKA_CLIENT_ONLY'] = "1"
+# os.environ['TIKA_SERVER_ENDPOINT'] = "http://tika:9998"
 
 from tika import parser
 

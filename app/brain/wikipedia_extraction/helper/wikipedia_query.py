@@ -1,3 +1,5 @@
+
+from typing import List,Dict
 import asyncio
 import aiohttp
 #Necessary because "Cannot run the event loop whole another loop is running"
@@ -5,7 +7,7 @@ import nest_asyncio
 nest_asyncio.apply()
 
 
-def get_wikipedia_titles(searchterms):
+def get_wikipedia_search_results(searchterms: List, number_of_searchresults) -> List[Dict[str,List]]:
 
     results= []
     def get_tasks(session):
@@ -17,6 +19,11 @@ def get_wikipedia_titles(searchterms):
                     "action": "query",
                     "format": "json",
                     "list": "search",
+                    #TODO: How to handle Section Title?
+                    "srprop":"sectiontitle",
+                    #TODO: Examine possibilities
+                    "srsort":"relevance",
+                    "srlimit": number_of_searchresults,
                     "srsearch": SEARCHPAGE
                 }
                 tasks.append(asyncio.create_task(session.get(url=URL, params=PARAMS, ssl=False)))
@@ -31,7 +38,7 @@ def get_wikipedia_titles(searchterms):
                 for response in responses:
                     DATA = await response.json()
                     try:
-                        results.append(DATA["query"]["search"][0]["title"])
+                        results.append(DATA["query"]["search"]) #["search"][0]["title"]
                     except IndexError:
                         results.append("not found")
 
@@ -40,16 +47,14 @@ def get_wikipedia_titles(searchterms):
     loop.run_until_complete(get_titles())
     loop.close()
 
-    return results
+    zipped_keywords_results = zip(searchterms,results)
+    #keywords_search_results = []
+    kw_wiki_search_dict = {}
+    for keyword, search_result_kw in zipped_keywords_results:
+        search_results_titles = []
+        for wiki_result in search_result_kw:
+            search_results_titles.append(wiki_result["title"])
+        kw_wiki_search_dict[keyword] = search_results_titles
+        #keywords_search_results.append(kw_wiki_search_dict)
 
-
-
-def get_wikipedia_links(wiki_titles):
-    pass
-
-def get_wikipedia_categories(wiki_page):
-    pass
-
-
-def is_disambiguation_page(wiki_page):
-    pass
+    return kw_wiki_search_dict

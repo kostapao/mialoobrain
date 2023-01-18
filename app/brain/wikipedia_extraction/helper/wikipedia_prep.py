@@ -6,6 +6,15 @@ import numpy as np
 import pandas as pd
 
 
+def create_piped_string(wiki_titles: List) -> str:
+    """To request data for multiple titles, they need to be in a tring split by pipes"""
+    final_string = ""
+    for i in wiki_titles:
+        final_string += i
+        final_string +="|"
+    if len(wiki_titles) > 1:
+        final_string = final_string[:-1]
+    return(final_string)
 
 
 def create_search_batches(lec:Lecture) -> List[List[str]]:
@@ -19,11 +28,12 @@ def create_search_batches(lec:Lecture) -> List[List[str]]:
             if kw_pos_to_kw_map[pos_kw][0].lecture_similarity_cluster == i:
                 search_group.append(pos_kw)
         final_search_list.append(search_group)
-    return final_search_list
+    lec.search_clusters = final_search_list
+    return lec
         
 
 
-def create_ranked_clusters(lec: Lecture) -> Lecture:
+def create_ranked_clusters(lec: Lecture, number_of_similarity_clusters = 3) -> Lecture:
     """Create clusters, rank by lecture similarity 1 -> most similar, 5 -> Least similar"""
     kw_pos_to_kw_map = kw_pos_to_kw_mapper(lec)
     #create dataframe with columns, kw_pos and vector
@@ -34,7 +44,6 @@ def create_ranked_clusters(lec: Lecture) -> Lecture:
         row = [kw_pos, bert_vector]
         rows.append(row)
     embeddings_df = pd.DataFrame(rows, columns=["kw_pos", "embedding"])
-    number_of_similarity_clusters = 5
     lec.number_of_similarity_clusters = number_of_similarity_clusters
     output= clustering(embeddings_df,NUM_CLUSTERS = number_of_similarity_clusters)
     #For every kw.pos get cos_sim_lecture
@@ -71,7 +80,7 @@ def create_ranked_clusters(lec: Lecture) -> Lecture:
 
 
 
-def clustering(data,NUM_CLUSTERS = 5):
+def clustering(data,NUM_CLUSTERS):
     X = np.array(data['embedding'].tolist())
     kclusterer = KMeansClusterer(
         NUM_CLUSTERS, distance=nltk.cluster.util.cosine_distance,
@@ -103,25 +112,3 @@ def kw_pos_to_kw_mapper(lecture: Lecture) -> Dict[str,List[Keyword]]:
 
 
 
-
-
-
-
-
-
-
-# def top_n(lecture: Lecture, n: int) -> List[Keyword]:
-#     all_keywords = []
-#     for slide in lecture.slides:
-#         for keyword in slide.keywords:
-#             sum_similarity = keyword.cos_sim_slide + keyword.cos_sim_lecture + keyword.cos_sim_neighbour
-#             all_keywords.append((sum_similarity, keyword.pos))
-#     #Sort by sum_similarity decreasing
-#     all_keywords_sorted = sorted(all_keywords, key=lambda tup: tup[0], reverse = True)
-#     top_n_list = []
-#     index = 0
-#     while len(top_n_list) < n:
-#         if all_keywords_sorted[index][1] not in top_n_list:
-#             top_n_list.append(all_keywords_sorted[index][1])
-#         index += 1
-#     return top_n_list
