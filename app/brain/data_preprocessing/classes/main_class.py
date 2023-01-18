@@ -3,7 +3,7 @@ Author: Konstantinos Lessis
 Created: 20.06.2022 
 Description: File containing the main classes the whole script works with, Lectures, Slides and Keyxwords
 """
-
+from typing import List,Dict
 
 class Lecture():
     def __init__(self):
@@ -22,6 +22,10 @@ class Lecture():
         self.n_gram_count_dict = None
         #wikipedia prep
         self.number_of_similarity_clusters = None
+        #Lists of keywords whereas lists are sorted by relevance descending
+        self.search_clusters = None
+        self.edges_list_wiki_titles = None
+        self.edges_json_id =  None
         
 
 
@@ -88,11 +92,6 @@ class Slide():
         return lower_newline_text
 
 
-
-
-
-
-
 class Keyword():
     def __init__(self,pos,is_in_title):
         self.pos = pos
@@ -110,10 +109,9 @@ class Keyword():
         #Wikipedia Related
         #self.wiki_url = None #str
         self.wiki_title = None # str
-        self.wiki_links = None #{title:link}
-        self.wiki_disambiguation = False #bool
-        self.wiki_search_results = None #list of tuples because order important
-        self.wiki_no_article = False #bool
+        self.wiki_title_sim_lecture = None
+        self.wiki_extract_sim_lecture = None
+
 
 
     def __str__(self):
@@ -126,3 +124,58 @@ class Keyword():
     def get_wiki_url(self):
         spaces_replaced = self.wiki_title.replace(" ","_")
         return "https://en.wikipedia.org/wiki/" + spaces_replaced
+
+#-----WIKIPEDIA CLASSES--------
+
+
+class WikiSearch():
+    def __init__(self, keyword, search_results):
+        self.source_keyword: str = keyword
+        self.search_results: List = search_results
+
+    def __repr__(self):
+        return "{"+ self.keyword + ": [" + ", ".join(self.search_results) +"]}"
+    @property
+    def get_first_result(self):
+        return self.search_results[0]
+
+
+
+class WikiArticle():
+    def __init__(self,wiki_title):
+        self.wiki_title: str = wiki_title
+        self.links: List = None
+        self.extract: str = None
+        #self.source_search: WikiSearch = None
+        self.keep: bool = None
+        self.title_lecture_similarity: int = None
+        self.source_keyword: str = None
+        self.source_search_results: List = None
+
+    def __str__(self):
+       return self.wiki_title
+    
+    def __repr__(self):
+        return self.__str__
+
+
+#-----NODE EDGES CLASSES--------
+
+    
+class Resource():
+    def __init__(self,label,url):
+        self.label = label
+        self.url = url
+
+class Node():
+    def __init__(self,id,label,resource):
+        self.id: str = id
+        self.label: str = label
+        self.resource: Resource = resource
+
+class Edge():
+    def __init__(self, nodeSource: Node, nodeTarget: Node):
+        self.nodeSource: Node  = nodeSource
+        self.nodeTarget: Node  = nodeTarget
+        self.id = "e"+nodeSource.id+"-"+nodeTarget.id
+
