@@ -1,6 +1,7 @@
 
 import sys
 import os
+from brain.data_preprocessing.classes.main_class import Lecture
 from brain.data_preprocessing.preprocess import data_preprocessing
 from brain.data_preprocessing.textprocess import text_processing
 from brain.keyword_extraction.keywordextraction import keyword_extraction
@@ -18,9 +19,12 @@ async def main(file):
     a = data_preprocessing(file)
     b = text_processing(a)
     c = keyword_extraction(b)
-    d = wikipedia_extraction(c)
-    e = connect(d)
-    return e
+    d = create_ranked_clusters(c)
+    e = create_search_batches(d)
+    f = wikipedia_extraction(e)
+    g = connect(f)
+    h = get_nodes_edges(g)
+    return h
 
 
 

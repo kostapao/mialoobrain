@@ -7,7 +7,7 @@ import nest_asyncio
 nest_asyncio.apply()
 
 
-def get_wikipedia_search_results(searchterms: List, number_of_searchresults) -> List[Dict[str,List]]:
+def get_wikipedia_search_results(searchterms: List, number_of_searchresults = 3) -> List[Dict[str,List]]:
 
     results= []
     def get_tasks(session):
@@ -38,10 +38,9 @@ def get_wikipedia_search_results(searchterms: List, number_of_searchresults) -> 
                 for response in responses:
                     DATA = await response.json()
                     try:
-                        results.append(DATA["query"]["search"]) #["search"][0]["title"]
-                    except IndexError:
-                        results.append("not found")
-
+                        results.append(DATA["query"]["search"])
+                    except KeyError:
+                        results.append([])
 
     loop = asyncio.new_event_loop()
     loop.run_until_complete(get_titles())
@@ -53,8 +52,17 @@ def get_wikipedia_search_results(searchterms: List, number_of_searchresults) -> 
     for keyword, search_result_kw in zipped_keywords_results:
         search_results_titles = []
         for wiki_result in search_result_kw:
-            search_results_titles.append(wiki_result["title"])
+            try:
+                search_results_titles.append(wiki_result["title"])
+            except KeyError:
+                pass
         kw_wiki_search_dict[keyword] = search_results_titles
-        #keywords_search_results.append(kw_wiki_search_dict)
 
     return kw_wiki_search_dict
+
+
+
+
+# example = ["Machine learning", "lisdhagfiuahgdf"]
+
+# print(get_wikipedia_search_results(example))
