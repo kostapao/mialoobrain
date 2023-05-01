@@ -11,6 +11,7 @@ RUN python3 -m nltk.downloader stopwords
 RUN python3 -m nltk.downloader punkt
 RUN python3 -m nltk.downloader averaged_perceptron_tagger
 ENV PYTHONPATH "${PYTHONPATH}:/code/app"
+RUN rm -rf /code/app
 
 COPY ./app /code/app
 
